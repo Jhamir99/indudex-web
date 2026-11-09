@@ -53,11 +53,12 @@ These carry over unchanged from the legacy product. Do not weaken them without a
 
 - **English everywhere**: code, identifiers, comments, docs, commit messages, PR descriptions.
 - **UI copy is written in English first**: `messages/en.json` is the source of truth, and `es`/`ca` are translations of it. New copy is added in English, then translated.
-- **Simple code**: prefer the plainest solution that works; no abstractions until a second real use needs them. Use descriptive names (no cryptic abbreviations). Comment only where it adds something the code cannot say, such as *why* a non-obvious decision was made, never *what* the next line does.
+- **Simple code**: prefer the plainest solution that works; no abstractions until a second real use needs them. Use descriptive names (no cryptic abbreviations). Comment only where it adds something the code cannot say, such as _why_ a non-obvious decision was made, never _what_ the next line does.
 - **Clean, responsive design**: every new screen must look and work well on mobile, tablet and desktop. Build mobile-first with Tailwind breakpoints, avoid horizontal scrolling and fixed widths, and keep touch targets comfortable. Check all three sizes before calling a screen done.
 - TypeScript in strict mode; import from `src` via the `@/*` alias.
 - Server Components by default. Add `"use client"` only where needed — notably CV reading, the plate codec and client-side filtering.
-- Deployment target is a **self-hosted Node server** (`next build` + `next start`, likely in Docker). Do not rely on Vercel-only features.
+- Deployment target is a **self-hosted Node server**: Docker running `next build` + `next start` (not `output: "standalone"`, which breaks the `/cat` prefix). Do not rely on Vercel-only features.
+- Formatting with **Prettier**, linting with **ESLint**; a pre-commit hook and CI enforce both, plus type-checking and tests.
 - Testing: **Vitest + Testing Library** for unit/component tests (`src/**/*.test.ts(x)`, next to the code they test), **Playwright** for end-to-end (`e2e/`). The plate codec and matching logic must have unit tests, including decoding of legacy plates. Vitest cannot render `async` Server Components: cover those with Playwright. Every new screen gets an e2e check, which runs on mobile, tablet and desktop sizes.
 
 ## Open decisions

@@ -9,8 +9,8 @@ afterEach(() => {
 describe("api client", () => {
   it("calls the API at NEXT_PUBLIC_API_URL and returns typed data", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.test");
-    const fetchMock = vi.fn<(request: Request) => Promise<Response>>(
-      async () => Response.json({ status: "ok" }),
+    const fetchMock = vi.fn<(request: Request) => Promise<Response>>(async () =>
+      Response.json({ status: "ok" }),
     );
     vi.stubGlobal("fetch", fetchMock);
 

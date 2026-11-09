@@ -22,15 +22,24 @@ Full rules are in `AGENTS.md`. The ones to keep in mind on every change:
 npm run dev     # next dev (http://localhost:3000)
 npm run build   # next build
 npm run start   # serve the production build
-npm run lint    # eslint (flat config in eslint.config.mjs, eslint-config-next)
-npx tsc --noEmit  # type-check
+npm run lint        # eslint (flat config in eslint.config.mjs, eslint-config-next)
+npm run format      # prettier --write .   (format:check in CI)
+npm run typecheck   # next typegen && tsc --noEmit (bare tsc fails on a clean checkout: route types live in .next)
 npm test            # vitest in watch mode
 npm run test:run    # vitest once (use this to verify a change)
 npx vitest run src/i18n/messages.test.ts   # a single test file
 npm run test:e2e    # playwright: builds, serves on :3100, runs e2e/ on mobile, tablet and desktop
-npm run api:types   # regenerate src/lib/api/schema.d.ts from http://localhost:4000/openapi.json (start indudex-api first: `pnpm dev` there)
 npx playwright test e2e/i18n.spec.ts --project=mobile   # one file, one size
+npm run api:types   # regenerate src/lib/api/schema.d.ts from http://localhost:4000/openapi.json (start indudex-api first: `pnpm dev` there)
 ```
+
+Before calling a change done, run what CI runs: `npm run lint && npm run format:check && npm run typecheck && npm run test:run` (and `npm run test:e2e` for UI changes).
+
+Tooling:
+
+- **Prettier** with default options plus `prettier-plugin-tailwindcss` (sorts Tailwind classes). `eslint-config-prettier` turns off ESLint rules that conflict with it; keep it last in `eslint.config.mjs`.
+- **Pre-commit hook** (husky + lint-staged, config in `package.json`): ESLint and Prettier on staged files. Never bypass it with `--no-verify`.
+- **CI** (`.github/workflows/ci.yml`): lint, format check, typecheck and unit tests, plus a separate Playwright job (report uploaded as an artifact when it fails). Node version from `.nvmrc`.
 
 Testing setup:
 
@@ -40,8 +49,9 @@ Testing setup:
 
 ## Stack and conventions
 
-- Next.js 16.4.5 (App Router, `src/app/`), React 19.3, TypeScript (strict), Tailwind CSS v4.
-- **This Next.js version has breaking changes versus common training data.** Read the relevant guide in `node_modules/next/dist/docs/` (`01-app`, `02-pages`, `03-architecture`) before writing Next.js code, and heed deprecation notices. Example already in the repo: layouts and pages type props with the global `LayoutProps<"/[locale]">` / `PageProps<"/[locale]">` helpers instead of hand-written prop types. Another: `middleware.ts` is now `proxy.ts`. If `tsc` reports errors in `.next/types` after moving routes, run `npm run build` (or `next dev`) to regenerate them.
+- Next.js 16.4.5 (App Router, `src/app/`), React 19.3, TypeScript 5.9 (strict), Tailwind CSS v4.
+- TypeScript stays on 5.9 for now: Next 16 declares `typescript@^5` and typescript-eslint supports `<6.1`. (indudex-api uses TypeScript 7 with oxlint instead.) Upgrade once both support 7.
+- **This Next.js version has breaking changes versus common training data.** Read the relevant guide in `node_modules/next/dist/docs/` (`01-app`, `02-pages`, `03-architecture`) before writing Next.js code, and heed deprecation notices. Example already in the repo: layouts and pages type props with the global `LayoutProps<"/[locale]">` / `PageProps<"/[locale]">` helpers instead of hand-written prop types. Another: `middleware.ts` is now `proxy.ts`. If `tsc` reports errors in `.next/types` or cannot find `LayoutProps`, use `npm run typecheck`, which regenerates the route types first.
 - Path alias: `@/*` → `./src/*`.
 - Tailwind v4 is wired through Turbopack in `next.config.ts` (`turbopack.rules` runs `@tailwindcss/turbopack` on `*.css`), not via a PostCSS config. Theme tokens live in `src/app/globals.css` (`@theme inline`, CSS variables `--background`/`--foreground` with a `prefers-color-scheme` dark override).
 - Fonts: Geist / Geist Mono loaded via `next/font/google` in `src/app/[locale]/layout.tsx` and exposed as `--font-geist-sans` / `--font-geist-mono` CSS variables.
@@ -51,8 +61,8 @@ Testing setup:
   - `src/app/[locale]/layout.tsx` is the root layout: validates the locale, sets `<html lang>` and wraps the app in `NextIntlClientProvider`.
   - `src/global.d.ts` types locales and message keys from `messages/en.json`, so a missing key is a type error.
   - Every page and layout calls `setRequestLocale(locale)` so it can render statically.
-  Check next-intl's docs for the installed version before changing this setup.
-- Deploy: self-hosted Node (`next start`, likely Docker). Consider `output: "standalone"` in `next.config.ts` when the Docker image is set up.
+  - Check next-intl's docs for the installed version before changing this setup.
+- Deploy: self-hosted, `Dockerfile` runs `next start` with production dependencies only. **Do not switch to `output: "standalone"`**: its server re-runs next-intl's `/cat` → `/ca` rewrite as an external request when the Host is a real domain, and `/cat` redirects to `/en/ca` (verified with Next 16.4.5). `NEXT_PUBLIC_API_URL` is a build argument because it is inlined into the bundle. API + web together: `docker-compose.yml` in indudex-api.
 - `AGENTS.md` has a block managed by `next dev` between `nextjs-agent-rules` markers; edit only outside it, and commit it rather than deleting it.
 
 ## Intended structure
