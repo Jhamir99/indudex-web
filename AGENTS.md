@@ -23,6 +23,28 @@ It is a rewrite of the monolith [`JustJans/indudex`](https://github.com/JustJans
 
 Use the legacy repo as the **behavioral reference** (what the product does and how matching works), not as code to copy: it is being restructured precisely because its structure is bad.
 
+## Current state
+
+> **Keep this section up to date.** Whenever a change alters what exists, what works or what is next (a page, a component, a lib, a message key, a dependency, a decision), update this section in the same commit. Skip it only if nothing here changes. Last updated: 2026-11-09.
+
+**Built**
+
+- Next.js 16 App Router app with Tailwind v4, under `src/app/[locale]/`.
+- i18n with next-intl: locales `en`, `es`, `ca` (URL prefixes `/en`, `/es`, `/cat`), locale middleware in `src/proxy.ts`, messages in `messages/*.json` with a test that keeps the three files' keys identical.
+- Typed API client: `src/lib/api/client.ts` (openapi-fetch) with types generated into `src/lib/api/schema.d.ts` from the API's `/openapi.json` (currently only `/health`). Base URL from `NEXT_PUBLIC_API_URL`.
+- A placeholder home page (title and description only).
+- Tooling: Vitest + Testing Library, Playwright e2e on mobile/tablet/desktop (`e2e/i18n.spec.ts`), ESLint, Prettier, husky + lint-staged, GitHub Actions CI, Dependabot, Dockerfile, licence and README.
+
+**Not built yet**
+
+- Every product feature: the plate codec, CV reading, client-side matching and filtering, the offer list and detail pages, filters UI, source attribution, "last rebuilt" notice, and calls to real API data (the API has no data endpoints yet).
+
+**Next**
+
+- Wait for the API's catalogue/shard endpoints, regenerate the types with `npm run api:types`, then build the plate codec (with legacy-plate tests) and the first real screen.
+
+**Open decisions**: see the section at the end of this file.
+
 ## Non-negotiable product rules
 
 These carry over unchanged from the legacy product. Do not weaken them without an explicit decision from the owner.
