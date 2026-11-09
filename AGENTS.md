@@ -37,7 +37,8 @@ These carry over unchanged from the legacy product. Do not weaken them without a
 
 - The FE **never** crawls sources, builds the pile, deduplicates or translates adverts. That is the backend's job (legacy `builder/`).
 - The FE consumes the backend only through its REST API, via a single client module (planned: `src/lib/api/`). Do not scatter `fetch` calls to the API across components.
-- The API is **hybrid**: the pile as JSON shards (by occupation family and country) + index + metadata, which the client downloads selectively and filters locally; plus regular endpoints for catalogues, advert detail, sources and pile status.
+- The API is **hybrid**: the pile as JSON shards (by locale, occupation family and country) + index + metadata, which the client downloads selectively and filters locally; plus regular endpoints for catalogues, advert detail, sources and pile status.
+- **Adverts come already translated** into every locale (`en`, `es`, `cat`). Always request the data for the current locale, and never translate adverts in the browser. An advert keeps the same id in every locale, so switching language keeps the same results and the same plate.
 - **Contract**: the backend's Zod schemas (`@hono/zod-openapi`) generate an OpenAPI spec. The FE generates its types and client from it with `openapi-typescript` + `openapi-fetch`. Never hand-write API types, and there is no shared types package.
 - Anything derived from the CV or the plate is computed on the client.
 
