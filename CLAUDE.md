@@ -14,7 +14,7 @@ Full rules are in `AGENTS.md`. The ones to keep in mind on every change:
 
 - Code and UI copy in English (`messages/en.json` is the source; `es`/`ca` are translations).
 - Simple code, descriptive names, comments only where they add something.
-- Keep the "Current state" section of `AGENTS.md` up to date: update it in the same commit as any change that alters what is built, what is missing or what is next.
+- Read `MEMORY.md` at the start of a task and update it at the end (see "Memory" in `AGENTS.md`).
 - Clean, responsive design: every new screen must work on mobile, tablet and desktop (mobile-first Tailwind).
 
 ## Commands
