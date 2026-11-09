@@ -33,6 +33,10 @@ Use the legacy repo as the **behavioral reference** (what the product does and h
 - If something becomes a permanent rule, propose moving it to `AGENTS.md` instead of leaving it in the memory.
 - Never store sensitive data in it (keys, tokens, personal data).
 
+## Rules
+
+- Read `docs/constitution.md` and the active spec (`specs/NNN-*/`) before touching code.
+
 ## Non-negotiable product rules
 
 These carry over unchanged from the legacy product. Do not weaken them without an explicit decision from the owner.
