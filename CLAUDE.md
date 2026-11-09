@@ -1,0 +1,64 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+**Read `AGENTS.md` first.** It holds the product context, the non-negotiable product rules (privacy, CV never uploaded, the URL-hash "plate"), the FE/BE boundary, i18n rules and open decisions. This file only adds Claude Code specifics and does not repeat them.
+
+## Status
+
+Frontend of Indudex (job portal for engineers and technicians in Europe), rewritten from the monolith [`JustJans/indudex`](https://github.com/JustJans/indudex). The repo is still the `create-next-app` scaffold: no application code yet. Update this file as real architecture emerges.
+
+## Core conventions
+
+Full rules are in `AGENTS.md`. The ones to keep in mind on every change:
+
+- Code and UI copy in English (`messages/en.json` is the source; `es`/`cat` are translations).
+- Simple code, descriptive names, comments only where they add something.
+- Clean, responsive design: every new screen must work on mobile, tablet and desktop (mobile-first Tailwind).
+
+## Commands
+
+```bash
+npm run dev     # next dev (http://localhost:3000)
+npm run build   # next build
+npm run start   # serve the production build
+npm run lint    # eslint (flat config in eslint.config.mjs, eslint-config-next)
+npx tsc --noEmit  # type-check
+```
+
+Planned, not installed yet: `npm test` (Vitest + Testing Library) and `npm run test:e2e` (Playwright). Add the scripts here when they exist.
+
+## Stack and conventions
+
+- Next.js 16.4.5 (App Router, `src/app/`), React 19.3, TypeScript (strict), Tailwind CSS v4.
+- **This Next.js version has breaking changes versus common training data.** Read the relevant guide in `node_modules/next/dist/docs/` (`01-app`, `02-pages`, `03-architecture`) before writing Next.js code, and heed deprecation notices. Example already in the repo: the root layout types props with the global `LayoutProps<"/">` helper instead of hand-written prop types.
+- Path alias: `@/*` → `./src/*`.
+- Tailwind v4 is wired through Turbopack in `next.config.ts` (`turbopack.rules` runs `@tailwindcss/turbopack` on `*.css`), not via a PostCSS config. Theme tokens live in `src/app/globals.css` (`@theme inline`, CSS variables `--background`/`--foreground` with a `prefers-color-scheme` dark override).
+- Fonts: Geist / Geist Mono loaded via `next/font/google` in `src/app/layout.tsx` and exposed as `--font-geist-sans` / `--font-geist-mono` CSS variables.
+- i18n: next-intl (to be installed), locales `en` / `es` / `cat`, all prefixed. Check the next-intl docs for the version installed — its App Router setup (middleware/proxy, request config) changes between majors.
+- Deploy: self-hosted Node (`next start`, likely Docker). Consider `output: "standalone"` in `next.config.ts` when the Docker image is set up.
+- `AGENTS.md` has a block managed by `next dev` between `nextjs-agent-rules` markers; edit only outside it, and commit it rather than deleting it.
+
+## Intended structure
+
+Target layout, not yet created — adjust here when it changes:
+
+```
+src/
+  app/[locale]/      # all routes, one segment per locale
+  components/        # shared UI
+  lib/api/           # the only REST client for the backend
+  lib/               # plate codec, CV reading, client-side filtering
+  i18n/              # next-intl routing/request config
+messages/            # en.json, es.json, cat.json
+```
+
+## Legacy reference
+
+When reproducing behavior, consult the legacy repo (`JustJans/indudex`) rather than guessing:
+
+- `app/lib/codec.js` — plate encoding/decoding (must stay compatible).
+- `app/lib/cv.js` — in-browser CV reading.
+- `app/lib/query.js`, `search.js`, `gates.js`, `titles.js`, `distance.js` — filtering and matching rules.
+- `app/lib/i18n.js` and `app/lib/{es,ca,de,fr,...}.js` — existing copy and translations.
+- `builder/` — backend concern; read only to understand the data shape the FE will receive.
