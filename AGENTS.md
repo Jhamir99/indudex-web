@@ -38,19 +38,20 @@ These carry over unchanged from the legacy product. Do not weaken them without a
 - The FE **never** crawls sources, builds the pile, deduplicates or translates adverts. That is the backend's job (legacy `builder/`).
 - The FE consumes the backend only through its REST API, via a single client module (planned: `src/lib/api/`). Do not scatter `fetch` calls to the API across components.
 - The API is **hybrid**: the pile as JSON shards (by locale, occupation family and country) + index + metadata, which the client downloads selectively and filters locally; plus regular endpoints for catalogues, advert detail, sources and pile status.
-- **Adverts come already translated** into every locale (`en`, `es`, `cat`). Always request the data for the current locale, and never translate adverts in the browser. An advert keeps the same id in every locale, so switching language keeps the same results and the same plate.
+- **Adverts come already translated** into every locale (`en`, `es`, `ca`). Always request the data for the current locale, and never translate adverts in the browser. An advert keeps the same id in every locale, so switching language keeps the same results and the same plate.
 - **Contract**: the backend's Zod schemas (`@hono/zod-openapi`) generate an OpenAPI spec. The FE generates its types and client from it with `openapi-typescript` + `openapi-fetch`. Never hand-write API types, and there is no shared types package.
 - Anything derived from the CV or the plate is computed on the client.
 
 ## Internationalization
 
-- Locales: **`en`, `es`, `cat`**, every one with a URL prefix (`/en/...`, `/es/...`, `/cat/...`). Library: **next-intl**; all routes live under `src/app/[locale]/`.
+- Locales: **`en`, `es`, `ca`**, every one with a URL prefix: `/en/...`, `/es/...` and `/cat/...`. Catalan's locale code is `ca` (the valid language tag, used by `Intl` and `<html lang>`), while its URL prefix stays `/cat` as on the legacy site. Use `ca` everywhere in code and data; only the URL says `cat`.
+- Library: **next-intl**; all routes live under `src/app/[locale]/`. Use `Link`, `redirect`, `useRouter` and friends from `@/i18n/navigation`, not from `next/link` / `next/navigation`, so the locale prefix is kept.
 - No hardcoded user-facing copy in components: every string goes through next-intl messages, and every key must exist in all three locales.
 
 ## Conventions
 
 - **English everywhere**: code, identifiers, comments, docs, commit messages, PR descriptions.
-- **UI copy is written in English first**: `messages/en.json` is the source of truth, and `es`/`cat` are translations of it. New copy is added in English, then translated.
+- **UI copy is written in English first**: `messages/en.json` is the source of truth, and `es`/`ca` are translations of it. New copy is added in English, then translated.
 - **Simple code**: prefer the plainest solution that works; no abstractions until a second real use needs them. Use descriptive names (no cryptic abbreviations). Comment only where it adds something the code cannot say, such as *why* a non-obvious decision was made, never *what* the next line does.
 - **Clean, responsive design**: every new screen must look and work well on mobile, tablet and desktop. Build mobile-first with Tailwind breakpoints, avoid horizontal scrolling and fixed widths, and keep touch targets comfortable. Check all three sizes before calling a screen done.
 - TypeScript in strict mode; import from `src` via the `@/*` alias.

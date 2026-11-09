@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Frontend of Indudex (job portal for engineers and technicians in Europe), rewritten from the monolith [`JustJans/indudex`](https://github.com/JustJans/indudex). The repo is still the `create-next-app` scaffold: no application code yet. Update this file as real architecture emerges.
+Frontend of Indudex (job portal for engineers and technicians in Europe), rewritten from the monolith [`JustJans/indudex`](https://github.com/JustJans/indudex). Only the i18n setup and a placeholder home page exist so far. Update this file as real architecture emerges.
 
 ## Core conventions
 
 Full rules are in `AGENTS.md`. The ones to keep in mind on every change:
 
-- Code and UI copy in English (`messages/en.json` is the source; `es`/`cat` are translations).
+- Code and UI copy in English (`messages/en.json` is the source; `es`/`ca` are translations).
 - Simple code, descriptive names, comments only where they add something.
 - Clean, responsive design: every new screen must work on mobile, tablet and desktop (mobile-first Tailwind).
 
@@ -31,11 +31,17 @@ Planned, not installed yet: `npm test` (Vitest + Testing Library) and `npm run t
 ## Stack and conventions
 
 - Next.js 16.4.5 (App Router, `src/app/`), React 19.3, TypeScript (strict), Tailwind CSS v4.
-- **This Next.js version has breaking changes versus common training data.** Read the relevant guide in `node_modules/next/dist/docs/` (`01-app`, `02-pages`, `03-architecture`) before writing Next.js code, and heed deprecation notices. Example already in the repo: the root layout types props with the global `LayoutProps<"/">` helper instead of hand-written prop types.
+- **This Next.js version has breaking changes versus common training data.** Read the relevant guide in `node_modules/next/dist/docs/` (`01-app`, `02-pages`, `03-architecture`) before writing Next.js code, and heed deprecation notices. Example already in the repo: layouts and pages type props with the global `LayoutProps<"/[locale]">` / `PageProps<"/[locale]">` helpers instead of hand-written prop types. Another: `middleware.ts` is now `proxy.ts`. If `tsc` reports errors in `.next/types` after moving routes, run `npm run build` (or `next dev`) to regenerate them.
 - Path alias: `@/*` → `./src/*`.
 - Tailwind v4 is wired through Turbopack in `next.config.ts` (`turbopack.rules` runs `@tailwindcss/turbopack` on `*.css`), not via a PostCSS config. Theme tokens live in `src/app/globals.css` (`@theme inline`, CSS variables `--background`/`--foreground` with a `prefers-color-scheme` dark override).
-- Fonts: Geist / Geist Mono loaded via `next/font/google` in `src/app/layout.tsx` and exposed as `--font-geist-sans` / `--font-geist-mono` CSS variables.
-- i18n: next-intl (to be installed), locales `en` / `es` / `cat`, all prefixed. Check the next-intl docs for the version installed — its App Router setup (middleware/proxy, request config) changes between majors.
+- Fonts: Geist / Geist Mono loaded via `next/font/google` in `src/app/[locale]/layout.tsx` and exposed as `--font-geist-sans` / `--font-geist-mono` CSS variables.
+- i18n: next-intl 4. Locales `en` / `es` / `ca`, URL prefixes `/en`, `/es`, `/cat` (set in `src/i18n/routing.ts`). Wiring:
+  - `src/proxy.ts` runs the next-intl middleware: redirects `/` by `Accept-Language`, and unknown prefixes to `/en/...`.
+  - `src/i18n/request.ts` loads `messages/<locale>.json`; `next.config.ts` wraps the config with the next-intl plugin.
+  - `src/app/[locale]/layout.tsx` is the root layout: validates the locale, sets `<html lang>` and wraps the app in `NextIntlClientProvider`.
+  - `src/global.d.ts` types locales and message keys from `messages/en.json`, so a missing key is a type error.
+  - Every page and layout calls `setRequestLocale(locale)` so it can render statically.
+  Check next-intl's docs for the installed version before changing this setup.
 - Deploy: self-hosted Node (`next start`, likely Docker). Consider `output: "standalone"` in `next.config.ts` when the Docker image is set up.
 - `AGENTS.md` has a block managed by `next dev` between `nextjs-agent-rules` markers; edit only outside it, and commit it rather than deleting it.
 
@@ -49,8 +55,9 @@ src/
   components/        # shared UI
   lib/api/           # the only REST client for the backend
   lib/               # plate codec, CV reading, client-side filtering
-  i18n/              # next-intl routing/request config
-messages/            # en.json, es.json, cat.json
+  i18n/              # next-intl routing, navigation and request config
+  proxy.ts           # next-intl locale middleware
+messages/            # en.json, es.json, ca.json
 ```
 
 ## Legacy reference
