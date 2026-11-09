@@ -28,6 +28,7 @@ npm test            # vitest in watch mode
 npm run test:run    # vitest once (use this to verify a change)
 npx vitest run src/i18n/messages.test.ts   # a single test file
 npm run test:e2e    # playwright: builds, serves on :3100, runs e2e/ on mobile, tablet and desktop
+npm run api:types   # regenerate src/lib/api/schema.d.ts from http://localhost:4000/openapi.json (start indudex-api first: `pnpm dev` there)
 npx playwright test e2e/i18n.spec.ts --project=mobile   # one file, one size
 ```
 
@@ -62,7 +63,7 @@ Target layout, not yet created — adjust here when it changes:
 src/
   app/[locale]/      # all routes, one segment per locale
   components/        # shared UI
-  lib/api/           # the only REST client for the backend
+  lib/api/           # client.ts (openapi-fetch) + schema.d.ts (generated) — the only way to call indudex-api
   lib/               # plate codec, CV reading, client-side filtering
   i18n/              # next-intl routing, navigation and request config
   proxy.ts           # next-intl locale middleware
