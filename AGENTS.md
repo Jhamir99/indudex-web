@@ -57,7 +57,7 @@ These carry over unchanged from the legacy product. Do not weaken them without a
 - TypeScript in strict mode; import from `src` via the `@/*` alias.
 - Server Components by default. Add `"use client"` only where needed — notably CV reading, the plate codec and client-side filtering.
 - Deployment target is a **self-hosted Node server** (`next build` + `next start`, likely in Docker). Do not rely on Vercel-only features.
-- Testing standard (to be installed): **Vitest + Testing Library** for unit/component tests, **Playwright** for end-to-end. The plate codec and matching logic must have unit tests, including decoding of legacy plates.
+- Testing: **Vitest + Testing Library** for unit/component tests (`src/**/*.test.ts(x)`, next to the code they test), **Playwright** for end-to-end (`e2e/`). The plate codec and matching logic must have unit tests, including decoding of legacy plates. Vitest cannot render `async` Server Components: cover those with Playwright. Every new screen gets an e2e check, which runs on mobile, tablet and desktop sizes.
 
 ## Open decisions
 

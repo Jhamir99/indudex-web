@@ -24,9 +24,18 @@ npm run build   # next build
 npm run start   # serve the production build
 npm run lint    # eslint (flat config in eslint.config.mjs, eslint-config-next)
 npx tsc --noEmit  # type-check
+npm test            # vitest in watch mode
+npm run test:run    # vitest once (use this to verify a change)
+npx vitest run src/i18n/messages.test.ts   # a single test file
+npm run test:e2e    # playwright: builds, serves on :3100, runs e2e/ on mobile, tablet and desktop
+npx playwright test e2e/i18n.spec.ts --project=mobile   # one file, one size
 ```
 
-Planned, not installed yet: `npm test` (Vitest + Testing Library) and `npm run test:e2e` (Playwright). Add the scripts here when they exist.
+Testing setup:
+
+- `vitest.config.mts`: jsdom, `@/*` alias via `vite-tsconfig-paths`, setup in `vitest.setup.ts` (jest-dom matchers + Testing Library cleanup).
+- `playwright.config.ts`: three projects (`mobile` Pixel 7, `tablet` iPad Mini, `desktop`), all on Chromium, so only Chromium is installed (`npx playwright install chromium`). The web server is a production build on port 3100; locally it reuses one already running there.
+- `src/i18n/messages.test.ts` fails if `es.json` or `ca.json` have different keys from `en.json`.
 
 ## Stack and conventions
 
