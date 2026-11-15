@@ -35,7 +35,13 @@ Use the legacy repo as the **behavioral reference** (what the product does and h
 
 ## Rules
 
-- Read `docs/constitution.md` and the active spec (`specs/NNN-*/`) before touching code.
+- Read `docs/constitution.md` and the feature's spec, plan and tasks (`features/NNN-<feature>/`) before touching code.
+
+## Features
+
+- Work is organised by feature. `features/NNN-<feature>/` holds `spec.md` (what and why, written with `/spec`), `plan.md` (how, generated from the spec) and `tasks.md` (generated from the plan). `NNN` is the order in which the features must be built (`001`, `002`, ...); `features/README.md` lists every feature with its status and explains the order. A feature starts when the ones before it are closed.
+- Code is **feature-first**: each feature's code lives in `src/features/<feature>/` (the name without the number) (components, hooks, logic and their tests). Route files in `src/app/[locale]/` stay thin: they import the feature's page and do nothing else. What two or more features use lives in `src/shared/`, and moves there only when a second feature needs it.
+- A feature never imports another feature's internals; if it needs something from another feature, that piece moves to `src/shared/`.
 
 ## Non-negotiable product rules
 

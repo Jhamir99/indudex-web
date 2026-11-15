@@ -68,17 +68,18 @@ Testing setup:
 
 ## Intended structure
 
-Target layout, not yet created — adjust here when it changes:
+Feature-first (rules in `AGENTS.md`, "Features"). Target layout, only partly created — adjust here when it changes:
 
 ```
+features/NNN-<feature>/    # spec.md, plan.md, tasks.md; features/README.md is the index
 src/
-  app/[locale]/      # all routes, one segment per locale
-  components/        # shared UI
-  lib/api/           # client.ts (openapi-fetch) + schema.d.ts (generated) — the only way to call indudex-api
-  lib/               # plate codec, CV reading, client-side filtering
-  i18n/              # next-intl routing, navigation and request config
-  proxy.ts           # next-intl locale middleware
-messages/            # en.json, es.json, ca.json
+  app/[locale]/        # routes only, one segment per locale; each route file imports its feature's page
+  features/<feature>/  # one folder per feature, e.g. plate/, offer-pile/, filters/, results/, cv-reader/
+  shared/              # UI and helpers two or more features use
+  lib/api/             # client.ts (openapi-fetch) + schema.d.ts (generated) — the only way to call indudex-api
+  i18n/                # next-intl routing, navigation and request config
+  proxy.ts             # next-intl locale middleware
+messages/              # en.json, es.json, ca.json
 ```
 
 ## Legacy reference

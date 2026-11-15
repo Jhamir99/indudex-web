@@ -1,6 +1,6 @@
 # MEMORY
 
-Working memory of indudex-web. Rules for keeping it: see "Memory" in `AGENTS.md`. Last updated: 2026-11-09.
+Working memory of indudex-web. Rules for keeping it: see "Memory" in `AGENTS.md`. Last updated: 2026-11-15.
 
 ## Current state
 
@@ -18,10 +18,11 @@ Working memory of indudex-web. Rules for keeping it: see "Memory" in `AGENTS.md`
 
 **Next**
 
-- When the API exposes catalogue/shard endpoints, run `npm run api:types`, then build the plate codec (with legacy-plate tests) and the first real screen.
+- When the API exposes catalogue/shard endpoints, run `npm run api:types`, then write the specs of `003-plate` and `004-offer-pile` with `/spec` and build them (plate codec with legacy-plate tests first). Order and status of every feature: `features/README.md`.
 
 ## Decisions
 
+- 2026-11-15: work organised by feature, like Session Recorder: `features/NNN-<feature>/{spec,plan,tasks}.md` with `features/README.md` as the index (numbered in build order; the code folders have no number), and feature-first code in `src/features/<feature>/` with thin route files and `src/shared/` for what two or more features use. The legacy web was split into 10 features (outline specs). Why: smaller specs closed one by one, code grouped by what it does (the legacy web was already organised this way).
 - No `output: "standalone"`: it breaks the `/cat` → `/ca` rewrite (verified with Next 16.4.5).
 - TypeScript stays on 5.9 until Next and typescript-eslint support 7.
 
